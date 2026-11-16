@@ -1,5 +1,19 @@
+import { useState } from "react";
 import { DELIVERY_FEE, formatKip, provinces } from "../data.js";
 // ↑ provinces and DELIVERY_FEE are ready for you to use in Checkpoints 2–3.
+
+const emptyForm = {
+  fullName: "",
+  phone: "",
+  email: "",
+  province: "",
+  delivery: "",
+  address: "",
+  payment: "",
+  note: "",
+  agree: false,
+
+};
 
 function Checkout({ cart, total, onBack, onPlaceOrder }) {
   // ─────────────────────────────────────────────────────────────
@@ -8,9 +22,22 @@ function Checkout({ cart, total, onBack, onPlaceOrder }) {
   //   • write ONE handleChange that works for every field (use e.target.name)
   //   • make the two inputs below controlled: value + onChange
   //
-  // CHECKPOINT 2 — add the other fields
-  //   email, province (select), delivery (radio), address (only when
-  //   delivery is "home"), payment (select), note (textarea), agree (checkbox)
+const [formData, setFormData] = useState(emptyForm);
+
+function handleChange(e) {
+  const{ name, value, type, checked } = e.target;
+
+  setFormData(previousValue => ({
+    ...previousValue,
+    [name]: type === "checkbox" ? checked : value
+  }));
+
+  console.log("AFTER INPUT>>>>", formData);
+
+}
+
+
+
   //
   // CHECKPOINT 3 — validation on submit
   //   write validate(formData) → returns an object of error messages,
@@ -41,15 +68,123 @@ function Checkout({ cart, total, onBack, onPlaceOrder }) {
           <div className="field">
             <label htmlFor="fullName">ຊື່ ແລະ ນາມສະກຸນ *</label>
             {/* This input is NOT controlled yet — React doesn't know what's typed in it */}
-            <input id="fullName" name="fullName" type="text" />
+
+            <input id="fullName" name="fullName" type="text" 
+            value={formData.fullName} 
+            onChange={handleChange} />
           </div>
 
           <div className="field">
             <label htmlFor="phone">ເບີໂທ * <span className="hint">(ຕົວເລກເທົ່ານັ້ນ ເຊັ່ນ 02055512345)</span></label>
-            <input id="phone" name="phone" type="tel" />
+
+            <input id="phone" name="phone" type="tel" 
+            value={formData.phone} 
+            onChange={handleChange} />
           </div>
 
-          {/* TODO (Checkpoint 2): the other fields go here */}
+          <div className="field">
+            <label htmlFor="email">ອີເມວ  <span className="hint">(ບໍ່ບັງຄັບ)</span></label>
+            <input id="email" name="email" type="email" 
+            value={formData.email} 
+            onChange={handleChange} />
+          </div>
+
+          <div className="field">
+            <label htmlFor="province">ແຂວງ</label>
+            <select id="province" 
+            name="province" 
+            value={formData.province} 
+            onChange={handleChange}>
+              {provinces.map((value) => (
+                <option value={value} key={value}>
+                  {value}
+                </option>
+              ))}
+
+            </select>
+          </div>  
+
+          <fieldset>
+            <legend>ການຮັບສີນຄ້າ</legend>
+              <legend className="choice">
+                <input 
+                type="radio" 
+                name="delivery" 
+                value="pickup"
+                checked={formData.delivery === "pickup"}
+                onChange={handleChange}
+                 />
+                (ມາຮັບເອງ) ຟຣິ
+              </legend>
+              <legend className="choice">
+              <input 
+                type="radio" 
+                name="delivery" 
+                value="home"
+                checked={formData.delivery === "home"}
+                onChange={handleChange}
+                 />
+                ສົ່ງເຖິງເຮືອນທ່ານ + {formatKip(DELIVERY_FEE)}
+              </legend>
+          </fieldset>
+
+              {formData.delivery === "home" && (
+                <div className="field">
+                  
+          <div className="field">
+            <label htmlFor="address">ທີ່ຢູ່ *</label>
+
+            <input id="address" name="address" type="text" 
+            value={formData.address} 
+            onChange={handleChange} />
+          </div>
+                </div>
+              )}
+
+            <div className="field">
+            <label htmlFor="note">ວິທີການຊຳລະ</label>
+            
+            <select id="payment" 
+            name="payment" 
+            value={formData.payment} 
+            onChange={handleChange}
+            >
+              
+                <option value="cash">
+                  ເງິນສົດ
+                </option>
+                <option value="transfer">
+                  ໂອນເງິນຜ່ານທະນາຄານ
+                </option>
+
+
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="note">ໝາຍເຫດ</label>
+              <span className="hint">({formData.note.length}/120)</span>
+
+            <textarea 
+            id="note" 
+            name="note"
+            rows="3"
+            maxLength="120" 
+            value={formData.note} 
+            onChange={handleChange} />
+          </div>
+
+          <div className="field">
+            <label htmlfor="note">ຂໍ້ຕົກລົງ
+              <input
+              id="agree"
+              name="agree"
+              type="checkbox"
+              checked={formData.agree}
+              onChange={handleChange}
+              />
+            </label>
+
+            </div>
 
           <button type="submit" className="submit-btn">ຢືນຢັນການສັ່ງຊື້</button>
         </form>
